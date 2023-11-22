@@ -1,0 +1,59 @@
+plugins {
+    id 'java-conventions'
+    id 'jacoco-report-aggregation'
+    id 'application'
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group 'com.fullcycle.catalogo.infrastructure'
+
+bootJar {
+    archiveName 'application.jar'
+    destinationDirectory.set(file("${rootProject.buildDir}/libs"))
+}
+
+dependencies {
+    implementation(project(":domain"))
+    implementation(project(":application"))
+
+    implementation 'com.google.guava:guava:31.1-jre'
+
+    implementation('org.springdoc:springdoc-openapi-webmvc-core:1.7.0')
+    implementation('org.springdoc:springdoc-openapi-ui:1.7.0')
+
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude module: 'spring-boot-starter-tomcat'
+    }
+    implementation('org.springframework.boot:spring-boot-starter-undertow')
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('org.springframework.boot:spring-boot-starter-oauth2-resource-server')
+
+    implementation('com.fasterxml.jackson.module:jackson-module-afterburner')
+
+    testImplementation(project(path: ':domain', configuration: 'testClasses'))
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.security:spring-security-test')
+
+    testImplementation('org.testcontainers:testcontainers:1.18.1')
+    testImplementation('org.testcontainers:junit-jupiter:1.18.1')
+}
+
+testCodeCoverageReport {
+    reports {
+        xml {
+            enabled true
+            destination file("$rootDir/build/reports/jacoco/test/jacocoTestReport.xml")
+        }
+
+        html {
+            enabled true
+            destination file("$rootDir/build/reports/jacoco/test/")
+        }
+    }
+}
+
+tasks.named("jacocoTestReport") {
+    dependsOn tasks.named("testCodeCoverageReport", JacocoReport)
+}

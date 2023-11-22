@@ -1,0 +1,3 @@
+keycloak:
+  realm: ${KEYCLOAK_REALM:fc3-codeflix}
+  host: ${KEYCLOAK_HOST:http://localhost:8443}
