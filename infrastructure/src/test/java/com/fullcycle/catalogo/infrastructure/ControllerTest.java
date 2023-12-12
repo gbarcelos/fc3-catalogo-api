@@ -1,4 +1,4 @@
-package com.fullcycle.admin.catalogo;
+package com.fullcycle.catalogo.infrastructure;
 
 import java.lang.annotation.*;
 

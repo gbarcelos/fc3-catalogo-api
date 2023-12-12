@@ -1,4 +1,4 @@
-package com.fullcycle.admin.catalogo;
+package com.fullcycle.catalogo.infrastructure;
 
 import com.fullcycle.catalogo.infrastructure.configuration.ObjectMapperConfig;
 import org.junit.jupiter.api.Tag;

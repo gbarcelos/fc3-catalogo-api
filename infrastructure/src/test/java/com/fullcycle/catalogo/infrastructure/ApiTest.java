@@ -1,4 +1,4 @@
-package com.fullcycle.admin.catalogo;
+package com.fullcycle.catalogo.infrastructure;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
