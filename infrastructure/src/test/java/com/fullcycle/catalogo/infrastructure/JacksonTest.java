@@ -12,4 +12,5 @@ import java.lang.annotation.*;
 @ActiveProfiles("test-integration")
 @JsonTest
 @Tag("integrationTest")
-public @interface JacksonTest {}
+public @interface JacksonTest {
+}
