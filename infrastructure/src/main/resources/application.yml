@@ -3,6 +3,9 @@ logging:
     ROOT: INFO
     com.fullcycle.catalogo: DEBUG
 
+graphql:
+  graphiql: false
+
 server:
   port: 8080
   servlet:
@@ -17,6 +20,9 @@ server:
       io: 2 # One IO thread per CPU core is a reasonable default: https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#listeners-2
 
 spring:
+  graphql:
+    graphiql:
+      enabled: ${graphql.graphiql}
   servlet:
     multipart:
       max-file-size: 10GB # Max file size.
