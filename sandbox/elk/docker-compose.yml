@@ -6,14 +6,19 @@ services:
     container_name: elk_es01
     restart: on-failure
     volumes:
-      - ../.docker/es01:/usr/share/elasticsearch/data
+      - es01:/usr/share/elasticsearch/data
     environment:
       - "discovery.type=single-node"
+      - "bootstrap.memory_lock=true"
+      - "cluster.name=codeflix"
+      - "node.name=es01"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - '9200:9200'
       - '9300:9300'
     networks:
       - elastic
+
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.9
     container_name: elk_kibana
@@ -26,6 +31,7 @@ services:
       - elasticsearch
     networks:
       - elastic
+
   logstash:
     image: docker.elastic.co/logstash/logstash:7.17.9
     container_name: elk_logstash
@@ -42,4 +48,8 @@ services:
 
 networks:
   elastic:
+    external: true
+
+volumes:
+  es01:
     external: true
