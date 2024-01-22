@@ -18,6 +18,7 @@ services:
       - '9300:9300'
     networks:
       - elastic
+
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.9
     container_name: elk_kibana
@@ -30,6 +31,7 @@ services:
       - elasticsearch
     networks:
       - elastic
+
   logstash:
     image: docker.elastic.co/logstash/logstash:7.17.9
     container_name: elk_logstash

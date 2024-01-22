@@ -27,14 +27,14 @@ public enum Json {
     return invoke(() -> INSTANCE.mapper.readValue(json, clazz));
   }
 
-  private final ObjectMapper mapper =
-      new Jackson2ObjectMapperBuilder()
+  private final ObjectMapper mapper = new Jackson2ObjectMapperBuilder()
           .dateFormat(new StdDateFormat())
           .featuresToDisable(
-              DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-              DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES,
-              DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES,
-              SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                  DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                  DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES,
+                  DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES,
+                  SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+          )
           .modules(new JavaTimeModule(), new Jdk8Module(), afterburnerModule())
           .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
           .build();

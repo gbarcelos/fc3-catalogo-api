@@ -17,7 +17,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":application"))
 
-    implementation 'com.google.guava:guava:31.1-jre'
+    implementation('com.google.guava:guava:31.1-jre')
 
     implementation('org.springdoc:springdoc-openapi-webmvc-core:1.7.0')
     implementation('org.springdoc:springdoc-openapi-ui:1.7.0')

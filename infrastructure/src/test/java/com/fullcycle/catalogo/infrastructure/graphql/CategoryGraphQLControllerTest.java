@@ -7,9 +7,9 @@ import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.domain.utils.IdUtils;
 import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import com.fullcycle.catalogo.GraphQLControllerTest;
-import com.fullcycle.catalogo.domain.utils.IdUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -148,7 +148,7 @@ public class CategoryGraphQLControllerTest {
     @Test
     public void givenCategoryInputWhenCallsSaveCategoryMutationShouldPersistAndReturn() {
         // given
-        final var expectedId = IdUtils.uniqueId();;
+        final var expectedId = IdUtils.uniqueId();
         final var expectedName = "Aulas";
         final var expectedDescription = "A melhor categoria";
         final var expectedActive = false;
