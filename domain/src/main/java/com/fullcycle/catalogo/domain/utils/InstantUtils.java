@@ -9,6 +9,6 @@ public final class InstantUtils {
     }
 
     public static Instant now() {
-        return Instant.now().truncatedTo(ChronoUnit.MICROS);
+        return Instant.now().truncatedTo(ChronoUnit.MILLIS);
     }
 }
