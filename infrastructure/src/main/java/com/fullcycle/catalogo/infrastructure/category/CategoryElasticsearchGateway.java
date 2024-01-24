@@ -38,8 +38,9 @@ public class CategoryElasticsearchGateway implements CategoryGateway {
     }
 
     @Override
-    public Optional<Category> findById(String anId) {
-        throw new UnsupportedOperationException();
+    public Optional<Category> findById(final String anId) {
+        return this.categoryRepository.findById(anId)
+                .map(CategoryDocument::toCategory);
     }
 
     @Override
