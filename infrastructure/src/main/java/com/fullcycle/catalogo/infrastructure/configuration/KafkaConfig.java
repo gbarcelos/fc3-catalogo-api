@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@Profile({"production", "development", "sandbox", "test-e2e"})
+//@Profile({"production", "development", "sandbox", "test-e2e"})
 public class KafkaConfig {
 
     private final KafkaProperties properties;
