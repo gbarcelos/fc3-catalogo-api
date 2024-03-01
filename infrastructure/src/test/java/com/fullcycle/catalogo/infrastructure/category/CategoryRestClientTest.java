@@ -81,7 +81,7 @@ public class CategoryRestClientTest {
     public void givenACategory_whenReceive5xxFromServer_shouldReturnInternalError() throws JsonProcessingException {
         // given
         final var expectedId = "123";
-        final var expectedErrorMessage = "Error observed from categories [resourceId:%s] [status:500]".formatted(expectedId);
+        final var expectedErrorMessage = "Failed to get Category of id %s".formatted(expectedId);
 
         final var responseBody = objectMapper.writeValueAsString(Map.of("message", "Internal Server Error"));
 
@@ -127,7 +127,7 @@ public class CategoryRestClientTest {
     public void givenACategory_whenReceiveTimeout_shouldReturnInternalError() throws JsonProcessingException {
         // given
         final var aulas = Fixture.Categories.aulas();
-        final var expectedErrorMessage = "Timeout observed from categories [resourceId:%s]".formatted(aulas.id());
+        final var expectedErrorMessage = "Timeout from category of ID %s".formatted(aulas.id());
 
         final var responseBody = objectMapper.writeValueAsString(new CategoryDTO(
                 aulas.id(),
@@ -144,7 +144,7 @@ public class CategoryRestClientTest {
                         .willReturn(aResponse()
                                 .withStatus(200)
                                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                .withFixedDelay(600)
+                                .withFixedDelay(900)
                                 .withBody(responseBody)
                         )
         );
