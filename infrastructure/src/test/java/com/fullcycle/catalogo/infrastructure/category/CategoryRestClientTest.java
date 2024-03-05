@@ -1,158 +1,144 @@
 package com.fullcycle.catalogo.infrastructure.category;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fullcycle.catalogo.IntegrationTestConfiguration;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+
+import com.fullcycle.catalogo.AbstractRestClientTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
-import com.fullcycle.catalogo.infrastructure.configuration.WebServerConfig;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Map;
+public class CategoryRestClientTest extends AbstractRestClientTest {
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+  @Autowired
+  private CategoryRestClient target;
 
-@ActiveProfiles("test-integration")
-@AutoConfigureWireMock(port = 0)
-@EnableAutoConfiguration(exclude = {
-        ElasticsearchRepositoriesAutoConfiguration.class,
-        KafkaAutoConfiguration.class,
-})
-@SpringBootTest(classes = {WebServerConfig.class, IntegrationTestConfiguration.class})
-@Tag("integrationTest")
-public class CategoryRestClientTest {
+  @Test
+  public void givenACategory_whenReceive200FromServer_shouldBeOk() {
+    // given
+    final var aulas = Fixture.Categories.aulas();
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    final var responseBody = writeValueAsString(new CategoryDTO(
+        aulas.id(),
+        aulas.name(),
+        aulas.description(),
+        aulas.active(),
+        aulas.createdAt(),
+        aulas.updatedAt(),
+        aulas.deletedAt()
+    ));
 
-    @Autowired
-    private CategoryRestClient target;
+    stubFor(
+        get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody(responseBody)
+            )
+    );
 
-    @Test
-    public void givenACategory_whenReceive200FromServer_shouldBeOk() throws JsonProcessingException {
-        // given
-        final var aulas = Fixture.Categories.aulas();
+    // when
+    final var actualCategory = target.getById(aulas.id()).get();
 
-        final var responseBody = objectMapper.writeValueAsString(new CategoryDTO(
-                aulas.id(),
-                aulas.name(),
-                aulas.description(),
-                aulas.active(),
-                aulas.createdAt(),
-                aulas.updatedAt(),
-                aulas.deletedAt()
-        ));
+    // then
+    Assertions.assertEquals(aulas.id(), actualCategory.id());
+    Assertions.assertEquals(aulas.name(), actualCategory.name());
+    Assertions.assertEquals(aulas.description(), actualCategory.description());
+    Assertions.assertEquals(aulas.active(), actualCategory.active());
+    Assertions.assertEquals(aulas.createdAt(), actualCategory.createdAt());
+    Assertions.assertEquals(aulas.updatedAt(), actualCategory.updatedAt());
+    Assertions.assertEquals(aulas.deletedAt(), actualCategory.deletedAt());
+  }
 
-        stubFor(
-                get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
-                        .willReturn(aResponse()
-                                .withStatus(200)
-                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                .withBody(responseBody)
-                        )
-        );
+  @Test
+  public void givenACategory_whenReceive5xxFromServer_shouldReturnInternalError() {
+    // given
+    final var expectedId = "123";
+    final var expectedErrorMessage = "Error observed from categories [resourceId:%s] [status:500]".formatted(
+        expectedId);
 
-        // when
-        final var actualCategory = target.getById(aulas.id()).get();
+    final var responseBody = writeValueAsString(
+        Map.of("message", "Internal Server Error"));
 
-        // then
-        Assertions.assertEquals(aulas.id(), actualCategory.id());
-        Assertions.assertEquals(aulas.name(), actualCategory.name());
-        Assertions.assertEquals(aulas.description(), actualCategory.description());
-        Assertions.assertEquals(aulas.active(), actualCategory.active());
-        Assertions.assertEquals(aulas.createdAt(), actualCategory.createdAt());
-        Assertions.assertEquals(aulas.updatedAt(), actualCategory.updatedAt());
-        Assertions.assertEquals(aulas.deletedAt(), actualCategory.deletedAt());
-    }
+    stubFor(
+        get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
+            .willReturn(aResponse()
+                .withStatus(500)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody(responseBody)
+            )
+    );
 
-    @Test
-    public void givenACategory_whenReceive5xxFromServer_shouldReturnInternalError() throws JsonProcessingException {
-        // given
-        final var expectedId = "123";
-        final var expectedErrorMessage = "Failed to get Category of id %s".formatted(expectedId);
+    // when
+    final var actualEx = Assertions.assertThrows(InternalErrorException.class,
+        () -> target.getById(expectedId));
 
-        final var responseBody = objectMapper.writeValueAsString(Map.of("message", "Internal Server Error"));
+    // then
+    Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+  }
 
-        stubFor(
-                get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
-                        .willReturn(aResponse()
-                                .withStatus(500)
-                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                .withBody(responseBody)
-                        )
-        );
+  @Test
+  public void givenACategory_whenReceive404NotFoundFromServer_shouldReturnEmpty() {
+    // given
+    final var expectedId = "123";
+    final var responseBody = writeValueAsString(Map.of("message", "Not found"));
 
-        // when
-        final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.getById(expectedId));
+    stubFor(
+        get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
+            .willReturn(aResponse()
+                .withStatus(404)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody(responseBody)
+            )
+    );
 
-        // then
-        Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
-    }
+    // when
+    final var actualCategory = target.getById(expectedId);
 
-    @Test
-    public void givenACategory_whenReceive404NotFoundFromServer_shouldReturnEmpty() throws JsonProcessingException {
-        // given
-        final var expectedId = "123";
-        final var responseBody = objectMapper.writeValueAsString(Map.of("message", "Not found"));
+    // then
+    Assertions.assertTrue(actualCategory.isEmpty());
+  }
 
-        stubFor(
-                get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
-                        .willReturn(aResponse()
-                                .withStatus(404)
-                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                .withBody(responseBody)
-                        )
-        );
+  @Test
+  public void givenACategory_whenReceiveTimeout_shouldReturnInternalError() {
+    // given
+    final var aulas = Fixture.Categories.aulas();
+    final var expectedErrorMessage = "Timeout observed from categories [resourceId:%s]".formatted(
+        aulas.id());
 
-        // when
-        final var actualCategory = target.getById(expectedId);
+    final var responseBody = writeValueAsString(new CategoryDTO(
+        aulas.id(),
+        aulas.name(),
+        aulas.description(),
+        aulas.active(),
+        aulas.createdAt(),
+        aulas.updatedAt(),
+        aulas.deletedAt()
+    ));
 
-        // then
-        Assertions.assertTrue(actualCategory.isEmpty());
-    }
+    stubFor(
+        get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withFixedDelay(1000)
+                .withBody(responseBody)
+            )
+    );
 
-    @Test
-    public void givenACategory_whenReceiveTimeout_shouldReturnInternalError() throws JsonProcessingException {
-        // given
-        final var aulas = Fixture.Categories.aulas();
-        final var expectedErrorMessage = "Timeout from category of ID %s".formatted(aulas.id());
+    // when
+    final var actualEx = Assertions.assertThrows(InternalErrorException.class,
+        () -> target.getById(aulas.id()));
 
-        final var responseBody = objectMapper.writeValueAsString(new CategoryDTO(
-                aulas.id(),
-                aulas.name(),
-                aulas.description(),
-                aulas.active(),
-                aulas.createdAt(),
-                aulas.updatedAt(),
-                aulas.deletedAt()
-        ));
-
-        stubFor(
-                get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
-                        .willReturn(aResponse()
-                                .withStatus(200)
-                                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                                .withFixedDelay(900)
-                                .withBody(responseBody)
-                        )
-        );
-
-        // when
-        final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.getById(aulas.id()));
-
-        // then
-        Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
-    }
+    // then
+    Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+  }
 }

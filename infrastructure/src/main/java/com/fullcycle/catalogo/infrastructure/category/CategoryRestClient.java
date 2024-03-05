@@ -1,53 +1,34 @@
 package com.fullcycle.catalogo.infrastructure.category;
 
-import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
-import com.fullcycle.catalogo.infrastructure.exceptions.NotFoundException;
+import com.fullcycle.catalogo.infrastructure.utils.HttpClient;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 @Component
-public class CategoryRestClient {
+public class CategoryRestClient implements HttpClient {
 
-  private RestClient restClient;
+  public static final String NAMESPACE = "categories";
+
+  private final RestClient restClient;
 
   public CategoryRestClient(final RestClient categoryHttpClient) {
     this.restClient = categoryHttpClient;
   }
 
+  @Override
+  public String namespace() {
+    return NAMESPACE;
+  }
+
   public Optional<CategoryDTO> getById(final String categoryId) {
-
-    try {
-      CategoryDTO response = this.restClient
-          .get()
-          .uri("/{id}", categoryId)
-          .retrieve()
-          .onStatus(HttpStatus.NOT_FOUND::equals, (req, res) -> {
-            throw NotFoundException.with("A category of ID %s was not found".formatted(categoryId));
-          })
-          .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-            throw InternalErrorException.with(
-                "Failed to get Category of id %s".formatted(categoryId));
-          })
-          .body(CategoryDTO.class);
-
-      return Optional.of(response);
-
-    } catch (NotFoundException ex) {
-      return Optional.empty();
-
-    } catch (ResourceAccessException ex) {
-      if (ExceptionUtils.getRootCause(ex) instanceof TimeoutException) {
-        throw InternalErrorException.with("Timeout from category of ID %s".formatted(categoryId),
-            ex);
-      }
-      throw ex;
-    }
+    return doGet(categoryId, () -> this.restClient
+        .get()
+        .uri("/{id}", categoryId)
+        .retrieve()
+        .onStatus(isNotFound, notFoundHandler(categoryId))
+        .onStatus(is5xx, a5xxHandler(categoryId))
+        .body(CategoryDTO.class));
   }
 }

@@ -14,4 +14,4 @@ logging:
 rest-client:
   base-url: "http://localhost:${wiremock.server.port:8001}"
   categories:
-    read-timeout: 800
+    read-timeout: 1000
