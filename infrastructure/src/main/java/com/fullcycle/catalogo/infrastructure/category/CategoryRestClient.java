@@ -2,6 +2,7 @@ package com.fullcycle.catalogo.infrastructure.category;
 
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
 import com.fullcycle.catalogo.infrastructure.utils.HttpClient;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -22,6 +23,7 @@ public class CategoryRestClient implements HttpClient {
     return NAMESPACE;
   }
 
+  @Retry(name = NAMESPACE)
   public Optional<CategoryDTO> getById(final String categoryId) {
     return doGet(categoryId, () -> this.restClient
         .get()

@@ -2,8 +2,10 @@ package com.fullcycle.catalogo.infrastructure.category;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 
 import com.fullcycle.catalogo.AbstractRestClientTest;
 import com.fullcycle.catalogo.domain.Fixture;
@@ -56,6 +58,8 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
     Assertions.assertEquals(aulas.createdAt(), actualCategory.createdAt());
     Assertions.assertEquals(aulas.updatedAt(), actualCategory.updatedAt());
     Assertions.assertEquals(aulas.deletedAt(), actualCategory.deletedAt());
+
+    verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
   }
 
   @Test
@@ -83,6 +87,8 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
 
     // then
     Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+
+    verify(2, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
   }
 
   @Test
@@ -105,6 +111,8 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
 
     // then
     Assertions.assertTrue(actualCategory.isEmpty());
+
+    verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
   }
 
   @Test
@@ -140,5 +148,7 @@ public class CategoryRestClientTest extends AbstractRestClientTest {
 
     // then
     Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
+
+    verify(2, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
   }
 }
