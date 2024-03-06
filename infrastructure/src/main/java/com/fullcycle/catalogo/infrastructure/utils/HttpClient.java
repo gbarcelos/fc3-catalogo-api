@@ -2,6 +2,7 @@ package com.fullcycle.catalogo.infrastructure.utils;
 
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
 import com.fullcycle.catalogo.infrastructure.exceptions.NotFoundException;
+import java.net.http.HttpConnectTimeoutException;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
@@ -43,13 +44,25 @@ public interface HttpClient {
       return Optional.empty();
 
     } catch (ResourceAccessException ex) {
-      if (ExceptionUtils.getRootCause(ex) instanceof TimeoutException) {
-        throw InternalErrorException.with(
-            "Timeout observed from %s [resourceId:%s]".formatted(namespace(), id),
-            ex);
-      }
-      throw ex;
+      throw handleResourceAccessException(id, ex);
     }
+  }
+
+  private InternalErrorException handleResourceAccessException(String id,
+      ResourceAccessException ex) {
+    final var cause = ExceptionUtils.getRootCause(ex);
+    if (cause instanceof HttpConnectTimeoutException) {
+      return InternalErrorException.with(
+          "ConnectTimeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
+    }
+
+    if (cause instanceof TimeoutException) {
+      return InternalErrorException.with(
+          "Timeout observed from %s [resourceId:%s]".formatted(namespace(), id),
+          ex);
+    }
+    return InternalErrorException.with(
+        "Error observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
   }
 
 }

@@ -2,8 +2,11 @@ package com.fullcycle.catalogo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fullcycle.catalogo.infrastructure.category.CategoryRestClient;
 import com.fullcycle.catalogo.infrastructure.configuration.WebServerConfig;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +26,19 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(classes = {WebServerConfig.class, IntegrationTestConfiguration.class})
 @Tag("integrationTest")
 public abstract class AbstractRestClientTest {
+
+  protected static final String CATEGORY = CategoryRestClient.NAMESPACE;
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private BulkheadRegistry bulkheadRegistry;
+
   @BeforeEach
-  public void before(){
+  public void beforeEach(){
     WireMock.reset();
     WireMock.resetAllRequests();
+    List.of(CATEGORY).forEach(this::resetFaultTolerance);
   }
 
   protected String writeValueAsString(Object obj){
@@ -38,5 +47,16 @@ public abstract class AbstractRestClientTest {
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  protected void acquireBulkheadPermission(final String name) {
+    bulkheadRegistry.bulkhead(name).acquirePermission();
+  }
+
+  protected void releaseBulkheadPermission(final String name) {
+    bulkheadRegistry.bulkhead(name).releasePermission();
+  }
+
+  private void resetFaultTolerance(String name) {
   }
 }
