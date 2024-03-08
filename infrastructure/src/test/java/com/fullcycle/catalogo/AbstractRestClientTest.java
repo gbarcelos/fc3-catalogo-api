@@ -6,7 +6,10 @@ import com.fullcycle.catalogo.infrastructure.category.CategoryRestClient;
 import com.fullcycle.catalogo.infrastructure.configuration.WebServerConfig;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,9 @@ public abstract class AbstractRestClientTest {
   @Autowired
   private BulkheadRegistry bulkheadRegistry;
 
+  @Autowired
+  private CircuitBreakerRegistry circuitBreakerRegistry;
+
   @BeforeEach
   public void beforeEach(){
     WireMock.reset();
@@ -57,6 +63,20 @@ public abstract class AbstractRestClientTest {
     bulkheadRegistry.bulkhead(name).releasePermission();
   }
 
+  protected void checkCircuitBreakerState(final String name, final CircuitBreaker.State expectedState) {
+    final var cb = circuitBreakerRegistry.circuitBreaker(name);
+    Assertions.assertEquals(expectedState, cb.getState());
+  }
+
+  protected void transitionToOpenState(final String name) {
+    circuitBreakerRegistry.circuitBreaker(name).transitionToOpenState();
+  }
+
+  protected void transitionToClosedState(final String name) {
+    circuitBreakerRegistry.circuitBreaker(name).transitionToClosedState();
+  }
+
   private void resetFaultTolerance(String name) {
+    circuitBreakerRegistry.circuitBreaker(name).reset();
   }
 }

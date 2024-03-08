@@ -3,6 +3,7 @@ package com.fullcycle.catalogo.infrastructure.utils;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
 import com.fullcycle.catalogo.infrastructure.exceptions.NotFoundException;
 import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
@@ -45,6 +46,8 @@ public interface HttpClient {
 
     } catch (ResourceAccessException ex) {
       throw handleResourceAccessException(id, ex);
+    } catch (Throwable t) {
+      throw handleThrowable(id, t);
     }
   }
 
@@ -56,13 +59,21 @@ public interface HttpClient {
           "ConnectTimeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
     }
 
-    if (cause instanceof TimeoutException) {
+    if (cause instanceof HttpTimeoutException || cause instanceof TimeoutException) {
       return InternalErrorException.with(
-          "Timeout observed from %s [resourceId:%s]".formatted(namespace(), id),
-          ex);
+          "Timeout observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
     }
+
     return InternalErrorException.with(
         "Error observed from %s [resourceId:%s]".formatted(namespace(), id), ex);
   }
 
+  private InternalErrorException handleThrowable(final String id, final Throwable t) {
+    if (t instanceof InternalErrorException ex) {
+      return ex;
+    }
+
+    return InternalErrorException.with(
+        "Unhandled error observed from %s [resourceId:%s]".formatted(namespace(), id), t);
+  }
 }
