@@ -6,10 +6,13 @@ import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import java.util.Optional;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
+@CacheConfig(cacheNames = "admin-categories")
 public class CategoryRestClient implements HttpClient {
 
   public static final String NAMESPACE = "categories";
@@ -25,6 +28,7 @@ public class CategoryRestClient implements HttpClient {
     return NAMESPACE;
   }
 
+  @Cacheable(key = "#categoryId")
   @Bulkhead(name = NAMESPACE)
   @CircuitBreaker(name = NAMESPACE)
   @Retry(name = NAMESPACE)
