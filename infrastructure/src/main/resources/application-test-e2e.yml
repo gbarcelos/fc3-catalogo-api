@@ -7,8 +7,10 @@ elasticsearch:
   password: elastic
 
 keycloak:
+  client-id: fc3-app
+  client-secret: seecret
+  host: "http://localhost:${wiremock.server.port:8001}"
   realm: test
-  host: http://test:8443
 
 logging:
   level:
@@ -27,7 +29,7 @@ resilience4j.bulkhead:
 resilience4j.circuitbreaker:
   configs:
     default:
-      minimumNumberOfCalls: 3
+      minimumNumberOfCalls: 2
       permittedNumberOfCallsInHalfOpenState: 1
       failureRateThreshold: 50
       slowCallRateThreshold: 50
