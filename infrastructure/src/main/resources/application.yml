@@ -6,7 +6,7 @@ cache:
 
 elasticsearch:
   connect-timeout: 250
-  socket-timeout: 1_000
+  socket-timeout: 2_000
 
 graphql:
   graphiql: false

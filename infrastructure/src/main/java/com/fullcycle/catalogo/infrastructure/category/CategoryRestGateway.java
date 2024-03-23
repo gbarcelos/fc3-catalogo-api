@@ -1,5 +1,6 @@
 package com.fullcycle.catalogo.infrastructure.category;
 
+import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
 import com.fullcycle.catalogo.infrastructure.utils.HttpClient;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
@@ -13,13 +14,13 @@ import org.springframework.web.client.RestClient;
 
 @Component
 @CacheConfig(cacheNames = "admin-categories")
-public class CategoryRestClient implements HttpClient {
+public class CategoryRestGateway implements CategoryGateway, HttpClient {
 
   public static final String NAMESPACE = "categories";
 
   private final RestClient restClient;
 
-  public CategoryRestClient(final RestClient categoryHttpClient) {
+  public CategoryRestGateway(final RestClient categoryHttpClient) {
     this.restClient = categoryHttpClient;
   }
 
@@ -32,13 +33,13 @@ public class CategoryRestClient implements HttpClient {
   @Bulkhead(name = NAMESPACE)
   @CircuitBreaker(name = NAMESPACE)
   @Retry(name = NAMESPACE)
-  public Optional<CategoryDTO> getById(final String categoryId) {
+  public Optional<Category> categoryOfId(final String categoryId) {
     return doGet(categoryId, () -> this.restClient
         .get()
         .uri("/{id}", categoryId)
         .retrieve()
         .onStatus(isNotFound, notFoundHandler(categoryId))
         .onStatus(is5xx, a5xxHandler(categoryId))
-        .body(CategoryDTO.class));
+        .body(CategoryDTO.class)).map(CategoryDTO::toCategory);
   }
 }
