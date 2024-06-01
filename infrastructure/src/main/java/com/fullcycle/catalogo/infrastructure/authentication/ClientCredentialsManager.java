@@ -2,11 +2,10 @@ package com.fullcycle.catalogo.infrastructure.authentication;
 
 import com.fullcycle.catalogo.infrastructure.authentication.AuthenticationGateway.ClientCredentialsInput;
 import com.fullcycle.catalogo.infrastructure.authentication.AuthenticationGateway.RefreshTokenInput;
+import com.fullcycle.catalogo.infrastructure.configuration.properties.KeycloakProperties;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import org.springframework.stereotype.Component;
-
-import com.fullcycle.catalogo.infrastructure.configuration.properties.KeycloakProperties;
 
 @Component
 public class ClientCredentialsManager implements GetClientCredentials, RefreshClientCredentials {
@@ -18,7 +17,6 @@ public class ClientCredentialsManager implements GetClientCredentials, RefreshCl
   private volatile ClientCredentials credentials;
 
   private final AuthenticationGateway authenticationGateway;
-
   private final KeycloakProperties keycloakProperties;
 
   public ClientCredentialsManager(
@@ -47,7 +45,8 @@ public class ClientCredentialsManager implements GetClientCredentials, RefreshCl
 
   private AuthenticationGateway.AuthenticationResult refreshToken() {
     try {
-      return this.authenticationGateway.refresh(new RefreshTokenInput(clientId(), clientSecret(), this.credentials.refreshToken()));
+      return this.authenticationGateway.refresh(
+          new RefreshTokenInput(clientId(), clientSecret(), this.credentials.refreshToken()));
     } catch (RuntimeException ex) {
       return this.login();
     }

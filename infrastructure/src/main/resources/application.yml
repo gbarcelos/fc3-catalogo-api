@@ -13,7 +13,7 @@ graphql:
 
 kafka:
   auto-create-topics: false
-  bootstrap-servers: localhost:9092
+  bootstrap-servers: kafkaaaa:9092
   pool-timeout: 1_000
   consumers:
     categories:
@@ -25,6 +25,10 @@ kafka:
 
 keycloak:
   token-uri: /protocol/openid-connect/token
+
+logging:
+  level:
+    ROOT: debug
 
 rest-client:
   categories:

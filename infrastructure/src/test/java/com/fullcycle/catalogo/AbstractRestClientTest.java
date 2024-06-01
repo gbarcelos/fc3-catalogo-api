@@ -33,6 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
 public abstract class AbstractRestClientTest {
 
   protected static final String CATEGORY = CategoryRestGateway.NAMESPACE;
+
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -46,7 +47,7 @@ public abstract class AbstractRestClientTest {
   private CacheManager cacheManager;
 
   @BeforeEach
-  public void beforeEach(){
+  void beforeEach() {
     WireMock.reset();
     WireMock.resetAllRequests();
     resetAllCaches();
@@ -57,12 +58,10 @@ public abstract class AbstractRestClientTest {
     return cacheManager.getCache(name);
   }
 
-  protected String writeValueAsString(Object obj){
-    try {
-      return objectMapper.writeValueAsString(obj);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+  protected void checkCircuitBreakerState(final String name,
+      final CircuitBreaker.State expectedState) {
+    final var cb = circuitBreakerRegistry.circuitBreaker(name);
+    Assertions.assertEquals(expectedState, cb.getState());
   }
 
   protected void acquireBulkheadPermission(final String name) {
@@ -73,11 +72,6 @@ public abstract class AbstractRestClientTest {
     bulkheadRegistry.bulkhead(name).releasePermission();
   }
 
-  protected void checkCircuitBreakerState(final String name, final CircuitBreaker.State expectedState) {
-    final var cb = circuitBreakerRegistry.circuitBreaker(name);
-    Assertions.assertEquals(expectedState, cb.getState());
-  }
-
   protected void transitionToOpenState(final String name) {
     circuitBreakerRegistry.circuitBreaker(name).transitionToOpenState();
   }
@@ -86,11 +80,19 @@ public abstract class AbstractRestClientTest {
     circuitBreakerRegistry.circuitBreaker(name).transitionToClosedState();
   }
 
-  private void resetFaultTolerance(String name) {
-    circuitBreakerRegistry.circuitBreaker(name).reset();
+  protected String writeValueAsString(final Object obj) {
+    try {
+      return objectMapper.writeValueAsString(obj);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void resetAllCaches() {
     cacheManager.getCacheNames().forEach(name -> cacheManager.getCache(name).clear());
+  }
+
+  private void resetFaultTolerance(final String name) {
+    circuitBreakerRegistry.circuitBreaker(name).reset();
   }
 }

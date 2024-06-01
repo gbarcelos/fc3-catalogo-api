@@ -22,49 +22,52 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Collections;
 
-@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092",
+    "port=9092"})
 @ActiveProfiles("test-integration")
 @EnableAutoConfiguration(exclude = {
-        ElasticsearchRepositoriesAutoConfiguration.class,
+    ElasticsearchRepositoriesAutoConfiguration.class,
 })
 @SpringBootTest(
-        classes = {WebServerConfig.class, IntegrationTestConfiguration.class},
-        properties = {"kafka.bootstrap-servers=${spring.embedded.kafka.brokers}"}
+    classes = {WebServerConfig.class, IntegrationTestConfiguration.class},
+    properties = {"kafka.bootstrap-servers=${spring.embedded.kafka.brokers}"}
 )
 @Tag("integrationTest")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractEmbeddedKafkaTest {
 
-    private Producer<String, String> producer;
+  private Producer<String, String> producer;
 
-    private AdminClient admin;
+  private AdminClient admin;
 
-    @Autowired
-    protected EmbeddedKafkaBroker kafkaBroker;
+  @Autowired
+  protected EmbeddedKafkaBroker kafkaBroker;
 
-    @BeforeAll
-    void init() {
-        admin = AdminClient.create(Collections.singletonMap(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker.getBrokersAsString()));
+  @BeforeAll
+  void init() {
+    admin = AdminClient.create(Collections.singletonMap(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
+        kafkaBroker.getBrokersAsString()));
 
-        producer =
-                new DefaultKafkaProducerFactory<>(KafkaTestUtils.producerProps(kafkaBroker), new StringSerializer(), new StringSerializer())
-                        .createProducer();
-    }
+    producer =
+        new DefaultKafkaProducerFactory<>(KafkaTestUtils.producerProps(kafkaBroker),
+            new StringSerializer(), new StringSerializer())
+            .createProducer();
+  }
 
-    @AfterAll
-    void shutdown() {
-        producer.close();
-    }
+  @AfterAll
+  void shutdown() {
+    producer.close();
+  }
 
-    protected AdminClient admin() {
-        return admin;
-    }
+  protected AdminClient admin() {
+    return admin;
+  }
 
-    protected Producer<String, String> producer() {
-        return producer;
-    }
+  protected Producer<String, String> producer() {
+    return producer;
+  }
 
-    protected Source aSource() {
-        return new Source("admin_mysql", "admin_catalogo", "categories");
-    }
+  protected Source aSource() {
+    return new Source("admin_mysql", "admin_catalogo", "categories");
+  }
 }

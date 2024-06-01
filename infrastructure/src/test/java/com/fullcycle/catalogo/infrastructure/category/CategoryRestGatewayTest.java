@@ -1,12 +1,5 @@
 package com.fullcycle.catalogo.infrastructure.category;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-
 import com.fullcycle.catalogo.AbstractRestClientTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
@@ -14,18 +7,22 @@ import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.util.Map;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
 public class CategoryRestGatewayTest extends AbstractRestClientTest {
 
   @Autowired
   private CategoryRestGateway target;
 
+  // OK
   @Test
   public void givenACategory_whenReceive200FromServer_shouldBeOk() {
     // given
@@ -109,6 +106,7 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(aulas.id()))));
   }
 
+  // 5XX
   @Test
   public void givenACategory_whenReceive5xxFromServer_shouldReturnInternalError() {
     // given
@@ -116,8 +114,7 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     final var expectedErrorMessage = "Error observed from categories [resourceId:%s] [status:500]".formatted(
         expectedId);
 
-    final var responseBody = writeValueAsString(
-        Map.of("message", "Internal Server Error"));
+    final var responseBody = writeValueAsString(Map.of("message", "Internal Server Error"));
 
     stubFor(
         get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
@@ -138,6 +135,7 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     verify(2, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
   }
 
+  // 404
   @Test
   public void givenACategory_whenReceive404NotFoundFromServer_shouldReturnEmpty() {
     // given
@@ -162,6 +160,7 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     verify(1, getRequestedFor(urlPathEqualTo("/api/categories/%s".formatted(expectedId))));
   }
 
+  // Timeout
   @Test
   public void givenACategory_whenReceiveTimeout_shouldReturnInternalError() {
     // given
@@ -184,7 +183,7 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .withFixedDelay(1000)
+                .withFixedDelay(600)
                 .withBody(responseBody)
             )
     );
@@ -207,7 +206,8 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     acquireBulkheadPermission(CATEGORY);
 
     // when
-    final var actualEx = Assertions.assertThrows(BulkheadFullException.class, () -> target.categoryOfId("123"));
+    final var actualEx = Assertions.assertThrows(BulkheadFullException.class,
+        () -> target.categoryOfId("123"));
 
     // then
     Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
@@ -223,7 +223,8 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     final var expectedErrorMessage = "CircuitBreaker 'categories' is OPEN and does not permit further calls";
 
     // when
-    final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.categoryOfId(expectedId));
+    final var actualEx = Assertions.assertThrows(CallNotPermittedException.class,
+        () -> this.target.categoryOfId(expectedId));
 
     // then
     checkCircuitBreakerState(CATEGORY, CircuitBreaker.State.OPEN);
@@ -250,8 +251,10 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     );
 
     // when
-    Assertions.assertThrows(InternalErrorException.class, () -> this.target.categoryOfId(expectedId));
-    final var actualEx = Assertions.assertThrows(CallNotPermittedException.class, () -> this.target.categoryOfId(expectedId));
+    Assertions.assertThrows(InternalErrorException.class,
+        () -> this.target.categoryOfId(expectedId));
+    final var actualEx = Assertions.assertThrows(CallNotPermittedException.class,
+        () -> this.target.categoryOfId(expectedId));
 
     // then
     checkCircuitBreakerState(CATEGORY, CircuitBreaker.State.OPEN);
