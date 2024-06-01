@@ -15,11 +15,11 @@ import java.util.Collection;
 
 @ActiveProfiles("test-integration")
 @ComponentScan(
-        basePackages = "com.fullcycle.catalogo",
-        useDefaultFilters = false,
-        includeFilters = {
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*ElasticsearchGateway")
-        }
+    basePackages = "com.fullcycle.catalogo",
+    useDefaultFilters = false,
+    includeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*ElasticsearchGateway")
+    }
 )
 @DataElasticsearchTest
 @ImportTestcontainers(ElasticsearchTestContainer.class)
@@ -27,11 +27,11 @@ import java.util.Collection;
 @Testcontainers
 public abstract class AbstractElasticsearchTest {
 
-    @Autowired
-    private Collection<ElasticsearchRepository<?, ?>> repositories;
+  @Autowired
+  private Collection<ElasticsearchRepository<?, ?>> repositories;
 
-    @BeforeEach
-    void cleanUp() {
-        this.repositories.forEach(ElasticsearchRepository::deleteAll);
-    }
+  @BeforeEach
+  void cleanUp() {
+    this.repositories.forEach(ElasticsearchRepository::deleteAll);
+  }
 }
