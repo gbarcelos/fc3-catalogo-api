@@ -26,9 +26,9 @@ kafka:
 keycloak:
   token-uri: /protocol/openid-connect/token
 
-logging:
-  level:
-    ROOT: debug
+#logging:
+#  level:
+#    ROOT: debug
 
 rest-client:
   categories:
