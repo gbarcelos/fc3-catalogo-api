@@ -4,6 +4,7 @@ import com.fullcycle.catalogo.domain.castmember.CastMember;
 import com.fullcycle.catalogo.domain.castmember.CastMemberGateway;
 import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberRepository;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,7 +30,8 @@ public class CastMemberElasticsearchGateway implements CastMemberGateway {
 
   @Override
   public CastMember save(final CastMember aMember) {
-    return null;
+    this.castMemberRepository.save(CastMemberDocument.from(aMember));
+    return aMember;
   }
 
   @Override
