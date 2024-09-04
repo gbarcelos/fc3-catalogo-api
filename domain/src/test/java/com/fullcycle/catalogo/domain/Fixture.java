@@ -46,59 +46,60 @@ public final class Fixture {
 
     public static Category aulas() {
       return Category.with(
-              UUID.randomUUID().toString().replace("-", ""),
-              "Aulas",
-              "Conteudo gravado",
-              true,
-              InstantUtils.now(),
-              InstantUtils.now(),
-              null
+          UUID.randomUUID().toString().replace("-", ""),
+          "Aulas",
+          "Conteudo gravado",
+          true,
+          InstantUtils.now(),
+          InstantUtils.now(),
+          null
       );
     }
 
     public static Category talks() {
       return Category.with(
-              UUID.randomUUID().toString().replace("-", ""),
-              "Talks",
-              "Conteudo ao vivo",
-              false,
-              InstantUtils.now(),
-              InstantUtils.now(),
-              InstantUtils.now()
+          UUID.randomUUID().toString().replace("-", ""),
+          "Talks",
+          "Conteudo ao vivo",
+          false,
+          InstantUtils.now(),
+          InstantUtils.now(),
+          InstantUtils.now()
       );
     }
 
     public static Category lives() {
       return Category.with(
-              UUID.randomUUID().toString().replace("-", ""),
-              "Lives",
-              "Conteudo ao vivo",
-              true,
-              InstantUtils.now(),
-              InstantUtils.now(),
-              null
+          UUID.randomUUID().toString().replace("-", ""),
+          "Lives",
+          "Conteudo ao vivo",
+          true,
+          InstantUtils.now(),
+          InstantUtils.now(),
+          null
       );
     }
   }
 
   public static final class CastMembers {
 
-    private static final CastMember WESLEY =
-        CastMember.with(UUID.randomUUID().toString(), "Wesley FullCycle", CastMemberType.ACTOR, InstantUtils.now(), InstantUtils.now());
-
-    private static final CastMember GABRIEL =
-        CastMember.with(UUID.randomUUID().toString(), "Gabriel FullCycle", CastMemberType.ACTOR, InstantUtils.now(), InstantUtils.now());
-
     public static CastMemberType type() {
       return FAKER.options().option(CastMemberType.values());
     }
 
     public static CastMember wesley() {
-      return CastMember.with(WESLEY);
+      return CastMember.with(UUID.randomUUID().toString(), "Wesley FullCycle", CastMemberType.ACTOR,
+          InstantUtils.now(), InstantUtils.now());
     }
 
     public static CastMember gabriel() {
-      return CastMember.with(GABRIEL);
+      return CastMember.with(UUID.randomUUID().toString(), "Gabriel FullCycle", CastMemberType.ACTOR,
+          InstantUtils.now(), InstantUtils.now());
+    }
+
+    public static CastMember leonan() {
+      return CastMember.with(UUID.randomUUID().toString(), "Leonan FullCycle",
+          CastMemberType.DIRECTOR, InstantUtils.now(), InstantUtils.now());
     }
   }
 }
