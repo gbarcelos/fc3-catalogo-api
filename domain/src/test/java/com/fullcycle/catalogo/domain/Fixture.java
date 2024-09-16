@@ -1,12 +1,15 @@
 package com.fullcycle.catalogo.domain;
 
+import static com.fullcycle.catalogo.domain.utils.InstantUtils.now;
+
 import com.fullcycle.catalogo.domain.castmember.CastMember;
 import com.fullcycle.catalogo.domain.castmember.CastMemberType;
 import com.fullcycle.catalogo.domain.category.Category;
-import com.fullcycle.catalogo.domain.utils.InstantUtils;
-import net.datafaker.Faker;
-
+import com.fullcycle.catalogo.domain.genre.Genre;
+import com.fullcycle.catalogo.domain.utils.IdUtils;
+import java.util.HashSet;
 import java.util.UUID;
+import net.datafaker.Faker;
 
 public final class Fixture {
 
@@ -50,8 +53,8 @@ public final class Fixture {
           "Aulas",
           "Conteudo gravado",
           true,
-          InstantUtils.now(),
-          InstantUtils.now(),
+          now(),
+          now(),
           null
       );
     }
@@ -62,9 +65,9 @@ public final class Fixture {
           "Talks",
           "Conteudo ao vivo",
           false,
-          InstantUtils.now(),
-          InstantUtils.now(),
-          InstantUtils.now()
+          now(),
+          now(),
+          now()
       );
     }
 
@@ -74,8 +77,8 @@ public final class Fixture {
           "Lives",
           "Conteudo ao vivo",
           true,
-          InstantUtils.now(),
-          InstantUtils.now(),
+          now(),
+          now(),
           null
       );
     }
@@ -89,17 +92,28 @@ public final class Fixture {
 
     public static CastMember wesley() {
       return CastMember.with(UUID.randomUUID().toString(), "Wesley FullCycle", CastMemberType.ACTOR,
-          InstantUtils.now(), InstantUtils.now());
+          now(), now());
     }
 
     public static CastMember gabriel() {
       return CastMember.with(UUID.randomUUID().toString(), "Gabriel FullCycle", CastMemberType.ACTOR,
-          InstantUtils.now(), InstantUtils.now());
+          now(), now());
     }
 
     public static CastMember leonan() {
       return CastMember.with(UUID.randomUUID().toString(), "Leonan FullCycle",
-          CastMemberType.DIRECTOR, InstantUtils.now(), InstantUtils.now());
+          CastMemberType.DIRECTOR, now(), now());
+    }
+  }
+
+  public static final class Genres {
+
+    public static Genre tech() {
+      return Genre.with(IdUtils.uniqueId(), "Technology", true, new HashSet<>(), now(), now(), now());
+    }
+
+    public static Genre business() {
+      return Genre.with(IdUtils.uniqueId(), "Business", true, new HashSet<>(), now(), now(), now());
     }
   }
 }
