@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class GenreInMemoryGateway implements GenreGateway {
 
   private final Map<String, Genre> db;
