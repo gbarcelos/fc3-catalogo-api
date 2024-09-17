@@ -1,6 +1,7 @@
 package com.fullcycle.catalogo.infrastructure.graphql;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,7 +11,10 @@ import com.fullcycle.catalogo.application.genre.list.ListGenreUseCase;
 import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
+import com.fullcycle.catalogo.domain.utils.IdUtils;
+import com.fullcycle.catalogo.domain.utils.InstantUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -157,5 +161,104 @@ public class GenreGraphQLControllerTest {
     Assertions.assertEquals(expectedDirection, actualQuery.direction());
     Assertions.assertEquals(expectedSearch, actualQuery.terms());
     Assertions.assertEquals(expectedCategories, actualQuery.categories());
+  }
+
+  @Test
+  public void givenInactiveGenreInput_whenCallsSaveGenreMutation_shouldPersistAndReturn() {
+    // given
+    final var expectedId = IdUtils.uniqueId();
+    final var expectedName = "Business";
+    final var expectedIsActive = false;
+    final var expectedCategories = Set.of("c1", "c2");
+    final var expectedDates = InstantUtils.now();
+
+    final var input = Map.of(
+        "id", expectedId,
+        "name", expectedName,
+        "active", String.valueOf(expectedIsActive),
+        "categories", expectedCategories,
+        "createdAt", expectedDates.toString(),
+        "updatedAt", expectedDates.toString(),
+        "deletedAt", expectedDates.toString()
+    );
+
+    final var query = """
+                mutation SaveGenre($input: GenreInput!) {
+                    genre: saveGenre(input: $input) {
+                        id
+                    }
+                }
+                """;
+
+    doReturn(new SaveGenreUseCase.Output(expectedId)).when(saveGenreUseCase).execute(any());
+
+    // when
+    this.graphql.document(query)
+        .variable("input", input)
+        .execute()
+        .path("genre.id").entity(String.class).isEqualTo(expectedId);
+
+    // then
+    final var capturer = ArgumentCaptor.forClass(SaveGenreUseCase.Input.class);
+
+    verify(this.saveGenreUseCase, times(1)).execute(capturer.capture());
+
+    final var actualGenre = capturer.getValue();
+    Assertions.assertEquals(expectedId, actualGenre.id());
+    Assertions.assertEquals(expectedName, actualGenre.name());
+    Assertions.assertEquals(expectedIsActive, actualGenre.active());
+    Assertions.assertEquals(expectedCategories, actualGenre.categories());
+    Assertions.assertEquals(expectedDates, actualGenre.createdAt());
+    Assertions.assertEquals(expectedDates, actualGenre.updatedAt());
+    Assertions.assertEquals(expectedDates, actualGenre.deletedAt());
+  }
+
+  @Test
+  public void givenActiveGenreInputWithoutDeletedAt_whenCallsSaveGenreMutation_shouldPersistAndReturn() {
+    // given
+    final var expectedId = IdUtils.uniqueId();
+    final var expectedName = "Business";
+    final var expectedIsActive = true;
+    final var expectedCategories = Set.of("c1", "c2");
+    final var expectedDates = InstantUtils.now();
+
+    final var input = Map.of(
+        "id", expectedId,
+        "name", expectedName,
+        "active", String.valueOf(expectedIsActive),
+        "categories", expectedCategories,
+        "createdAt", expectedDates.toString(),
+        "updatedAt", expectedDates.toString()
+    );
+
+    final var query = """
+                mutation SaveGenre($input: GenreInput!) {
+                    genre: saveGenre(input: $input) {
+                        id
+                    }
+                }
+                """;
+
+    doReturn(new SaveGenreUseCase.Output(expectedId)).when(saveGenreUseCase).execute(any());
+
+    // when
+    this.graphql.document(query)
+        .variable("input", input)
+        .execute()
+        .path("genre.id").entity(String.class).isEqualTo(expectedId);
+
+    // then
+    final var capturer = ArgumentCaptor.forClass(SaveGenreUseCase.Input.class);
+
+    verify(this.saveGenreUseCase, times(1)).execute(capturer.capture());
+
+    final var actualGenre = capturer.getValue();
+    Assertions.assertEquals(expectedId, actualGenre.id());
+    Assertions.assertEquals(expectedName, actualGenre.name());
+    Assertions.assertEquals(expectedIsActive, actualGenre.active());
+    Assertions.assertEquals(expectedCategories, actualGenre.categories());
+    Assertions.assertEquals(expectedDates, actualGenre.createdAt());
+    Assertions.assertEquals(expectedDates, actualGenre.updatedAt());
+    Assertions.assertNull(actualGenre.deletedAt());
   }
 }
