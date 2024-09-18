@@ -38,7 +38,8 @@ public class GenreElasticsearchGateway implements GenreGateway {
 
   @Override
   public Optional<Genre> findById(final String genreId) {
-    return Optional.empty();
+    return this.genreRepository.findById(genreId)
+        .map(GenreDocument::toGenre);
   }
 
   @Override

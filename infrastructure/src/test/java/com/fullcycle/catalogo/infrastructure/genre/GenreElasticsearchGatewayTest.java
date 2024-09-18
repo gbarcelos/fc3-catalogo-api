@@ -31,7 +31,8 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @Test
   public void givenActiveGenreWithCategories_whenCallsSave_shouldPersistIt() {
     // given
-    final var tech = Genre.with(IdUtils.uniqueId(), "Technology", true, Set.of("c1", "c2"), now(), now(), null);
+    final var tech = Genre.with(IdUtils.uniqueId(), "Technology", true, Set.of("c1", "c2"), now(),
+        now(), null);
 
     // when
     final var actualOutput = this.genreGateway.save(tech);
@@ -52,7 +53,8 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @Test
   public void givenInactiveGenreWithoutCategories_whenCallsSave_shouldPersistIt() {
     // given
-    final var tech = Genre.with(IdUtils.uniqueId(), "Technology", false, new HashSet<>(), now(), now(), now());
+    final var tech = Genre.with(IdUtils.uniqueId(), "Technology", false, new HashSet<>(), now(),
+        now(), now());
 
     // when
     final var actualOutput = this.genreGateway.save(tech);
@@ -94,5 +96,65 @@ public class GenreElasticsearchGatewayTest extends AbstractElasticsearchTest {
 
     // when/then
     Assertions.assertDoesNotThrow(() -> this.genreGateway.deleteById(expectedId));
+  }
+
+  @Test
+  public void givenActiveGenreWithCategories_whenCallsFindById_shouldRetrieveIt() {
+    // given
+    final var business = Genre.with(IdUtils.uniqueId(), "Business", true, Set.of("c1", "c2"), now(),
+        now(), null);
+
+    this.genreRepository.save(GenreDocument.from(business));
+
+    final var expectedId = business.id();
+    Assertions.assertTrue(this.genreRepository.existsById(expectedId));
+
+    // when
+    final var actualOutput = this.genreGateway.findById(expectedId).get();
+
+    // then
+    Assertions.assertEquals(business.id(), actualOutput.id());
+    Assertions.assertEquals(business.name(), actualOutput.name());
+    Assertions.assertEquals(business.active(), actualOutput.active());
+    Assertions.assertEquals(business.categories(), actualOutput.categories());
+    Assertions.assertEquals(business.createdAt(), actualOutput.createdAt());
+    Assertions.assertEquals(business.updatedAt(), actualOutput.updatedAt());
+    Assertions.assertEquals(business.deletedAt(), actualOutput.deletedAt());
+  }
+
+  @Test
+  public void givenInactiveGenreWithoutCategories_whenCallsFindById_shouldRetrieveIt() {
+    // given
+    final var business = Genre.with(IdUtils.uniqueId(), "Business", false, Set.of(), now(), now(),
+        now());
+
+    this.genreRepository.save(GenreDocument.from(business));
+
+    final var expectedId = business.id();
+    Assertions.assertTrue(this.genreRepository.existsById(expectedId));
+
+    // when
+    final var actualOutput = this.genreGateway.findById(expectedId).get();
+
+    // then
+    Assertions.assertEquals(business.id(), actualOutput.id());
+    Assertions.assertEquals(business.name(), actualOutput.name());
+    Assertions.assertEquals(business.active(), actualOutput.active());
+    Assertions.assertEquals(business.categories(), actualOutput.categories());
+    Assertions.assertEquals(business.createdAt(), actualOutput.createdAt());
+    Assertions.assertEquals(business.updatedAt(), actualOutput.updatedAt());
+    Assertions.assertEquals(business.deletedAt(), actualOutput.deletedAt());
+  }
+
+  @Test
+  public void givenInvalidId_whenCallsFindById_shouldReturnEmpty() {
+    // given
+    final var expectedId = "any";
+
+    // when
+    final var actualOutput = this.genreGateway.findById(expectedId);
+
+    // then
+    Assertions.assertTrue(actualOutput.isEmpty());
   }
 }
