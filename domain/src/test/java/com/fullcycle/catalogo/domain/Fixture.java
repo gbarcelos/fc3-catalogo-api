@@ -8,6 +8,7 @@ import com.fullcycle.catalogo.domain.category.Category;
 import com.fullcycle.catalogo.domain.genre.Genre;
 import com.fullcycle.catalogo.domain.utils.IdUtils;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import net.datafaker.Faker;
 
@@ -109,11 +110,15 @@ public final class Fixture {
   public static final class Genres {
 
     public static Genre tech() {
-      return Genre.with(IdUtils.uniqueId(), "Technology", true, new HashSet<>(), now(), now(), now());
+      return Genre.with(IdUtils.uniqueId(), "Technology", true, Set.of("c456"), now(), now(), null);
     }
 
     public static Genre business() {
-      return Genre.with(IdUtils.uniqueId(), "Business", true, new HashSet<>(), now(), now(), now());
+      return Genre.with(IdUtils.uniqueId(), "Business", false, new HashSet<>(), now(), now(), now());
+    }
+
+    public static Genre marketing() {
+      return Genre.with(IdUtils.uniqueId(), "Marketing", true, Set.of("c123"), now(), now(), null);
     }
   }
 }
