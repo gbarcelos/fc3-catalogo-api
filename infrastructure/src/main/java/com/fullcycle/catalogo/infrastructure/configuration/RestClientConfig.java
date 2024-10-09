@@ -1,6 +1,8 @@
 package com.fullcycle.catalogo.infrastructure.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fullcycle.catalogo.infrastructure.configuration.annotations.Categories;
+import com.fullcycle.catalogo.infrastructure.configuration.annotations.Genres;
 import com.fullcycle.catalogo.infrastructure.configuration.annotations.Keycloak;
 import com.fullcycle.catalogo.infrastructure.configuration.properties.RestClientProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,6 +23,13 @@ public class RestClientConfig {
   }
 
   @Bean
+  @Genres
+  @ConfigurationProperties(prefix = "rest-client.genres")
+  public RestClientProperties genreRestClientProperties() {
+    return new RestClientProperties();
+  }
+
+  @Bean
   @Keycloak
   @ConfigurationProperties(prefix = "rest-client.keycloak")
   public RestClientProperties keycloakRestClientProperties() {
@@ -30,6 +39,12 @@ public class RestClientConfig {
   @Bean
   @Categories
   public RestClient categoryHttpClient(@Categories final RestClientProperties properties) {
+    return restClient(properties);
+  }
+
+  @Bean
+  @Genres
+  public RestClient genreHttpClient(@Genres final RestClientProperties properties) {
     return restClient(properties);
   }
 
