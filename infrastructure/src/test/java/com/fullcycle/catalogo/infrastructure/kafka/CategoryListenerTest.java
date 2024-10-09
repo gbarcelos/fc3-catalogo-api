@@ -160,7 +160,7 @@ public class CategoryListenerTest extends AbstractEmbeddedKafkaTest {
 
     final var message =
         Json.writeValueAsString(new MessageValue<>(
-            new ValuePayload<>(aulasEvent, aulasEvent, aSource(), Operation.CREATE)));
+            new ValuePayload<>(aulasEvent, null, aSource(), Operation.CREATE)));
 
     final var latch = new CountDownLatch(1);
 
@@ -190,7 +190,7 @@ public class CategoryListenerTest extends AbstractEmbeddedKafkaTest {
 
     final var message =
         Json.writeValueAsString(new MessageValue<>(
-            new ValuePayload<>(aulasEvent, aulasEvent, aSource(), Operation.DELETE)));
+            new ValuePayload<>(null, aulasEvent, aSource(), Operation.DELETE)));
 
     final var latch = new CountDownLatch(1);
 

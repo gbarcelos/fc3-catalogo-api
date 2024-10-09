@@ -3,6 +3,7 @@ package com.fullcycle.catalogo.infrastructure.category;
 import com.fullcycle.catalogo.AbstractRestClientTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
+import com.fullcycle.catalogo.infrastructure.authentication.ClientCredentialsManager;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryDTO;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -10,17 +11,22 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.mockito.Mockito.doReturn;
 
 public class CategoryRestGatewayTest extends AbstractRestClientTest {
 
   @Autowired
   private CategoryRestGateway target;
+
+  @SpyBean
+  private ClientCredentialsManager credentialsManager;
 
   // OK
   @Test
@@ -38,8 +44,13 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
         aulas.deletedAt()
     ));
 
+
+    final var expectedToken = "access-123";
+    doReturn(expectedToken).when(credentialsManager).retrieve();
+
     stubFor(
         get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
+            .withHeader(HttpHeaders.AUTHORIZATION, equalTo("bearer %s".formatted(expectedToken)))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -77,8 +88,12 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
         aulas.deletedAt()
     ));
 
+    final var expectedToken = "access-123";
+    doReturn(expectedToken).when(credentialsManager).retrieve();
+
     stubFor(
         get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
+            .withHeader(HttpHeaders.AUTHORIZATION, equalTo("bearer %s".formatted(expectedToken)))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -116,8 +131,12 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
 
     final var responseBody = writeValueAsString(Map.of("message", "Internal Server Error"));
 
+    final var expectedToken = "access-123";
+    doReturn(expectedToken).when(credentialsManager).retrieve();
+
     stubFor(
         get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
+            .withHeader(HttpHeaders.AUTHORIZATION, equalTo("bearer %s".formatted(expectedToken)))
             .willReturn(aResponse()
                 .withStatus(500)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -142,8 +161,12 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     final var expectedId = "123";
     final var responseBody = writeValueAsString(Map.of("message", "Not found"));
 
+    final var expectedToken = "access-123";
+    doReturn(expectedToken).when(credentialsManager).retrieve();
+
     stubFor(
         get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
+            .withHeader(HttpHeaders.AUTHORIZATION, equalTo("bearer %s".formatted(expectedToken)))
             .willReturn(aResponse()
                 .withStatus(404)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -165,8 +188,7 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
   public void givenACategory_whenReceiveTimeout_shouldReturnInternalError() {
     // given
     final var aulas = Fixture.Categories.aulas();
-    final var expectedErrorMessage = "Timeout observed from categories [resourceId:%s]".formatted(
-        aulas.id());
+    final var expectedErrorMessage = "Timeout observed from categories [resourceId:%s]".formatted(aulas.id());
 
     final var responseBody = writeValueAsString(new CategoryDTO(
         aulas.id(),
@@ -178,8 +200,12 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
         aulas.deletedAt()
     ));
 
+    final var expectedToken = "access-123";
+    doReturn(expectedToken).when(credentialsManager).retrieve();
+
     stubFor(
         get(urlPathEqualTo("/api/categories/%s".formatted(aulas.id())))
+            .withHeader(HttpHeaders.AUTHORIZATION, equalTo("bearer %s".formatted(expectedToken)))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -189,8 +215,7 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
     );
 
     // when
-    final var actualEx = Assertions.assertThrows(InternalErrorException.class,
-        () -> target.categoryOfId(aulas.id()));
+    final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.categoryOfId(aulas.id()));
 
     // then
     Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
@@ -241,8 +266,12 @@ public class CategoryRestGatewayTest extends AbstractRestClientTest {
 
     final var responseBody = writeValueAsString(Map.of("message", "Internal Server Error"));
 
+    final var expectedToken = "access-123";
+    doReturn(expectedToken).when(credentialsManager).retrieve();
+
     stubFor(
         get(urlPathEqualTo("/api/categories/%s".formatted(expectedId)))
+            .withHeader(HttpHeaders.AUTHORIZATION, equalTo("bearer %s".formatted(expectedToken)))
             .willReturn(aResponse()
                 .withStatus(500)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
