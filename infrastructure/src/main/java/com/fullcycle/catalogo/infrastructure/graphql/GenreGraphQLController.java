@@ -3,6 +3,7 @@ package com.fullcycle.catalogo.infrastructure.graphql;
 import com.fullcycle.catalogo.application.genre.list.ListGenreUseCase;
 import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
 import com.fullcycle.catalogo.infrastructure.genre.models.GenreDTO;
+import com.fullcycle.catalogo.infrastructure.genre.models.GenreInput;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class GenreGraphQLController {
   }
 
   @MutationMapping
-  public SaveGenreUseCase.Output saveGenre(@Argument(name = "input") final GenreDTO arg) {
+  public SaveGenreUseCase.Output saveGenre(@Argument(name = "input") final GenreInput arg) {
     final var input =
         new SaveGenreUseCase.Input(arg.id(),
             arg.name(),
