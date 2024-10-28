@@ -9,8 +9,11 @@ import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberRepository;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -52,6 +55,16 @@ public class CastMemberElasticsearchGateway implements CastMemberGateway {
   public Optional<CastMember> findById(final String anId) {
     return this.castMemberRepository.findById(anId)
         .map(CastMemberDocument::toCastMember);
+  }
+
+  @Override
+  public List<CastMember> findAllById(final Set<String> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return List.of();
+    }
+    return StreamSupport.stream(this.castMemberRepository.findAllById(ids).spliterator(), false)
+        .map(CastMemberDocument::toCastMember)
+        .toList();
   }
 
   @Override

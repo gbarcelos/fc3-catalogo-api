@@ -2,9 +2,12 @@ package com.fullcycle.catalogo.infrastructure.castmember;
 
 import com.fullcycle.catalogo.AbstractElasticsearchTest;
 import com.fullcycle.catalogo.domain.Fixture;
+import com.fullcycle.catalogo.domain.castmember.CastMember;
 import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberDocument;
 import com.fullcycle.catalogo.infrastructure.castmember.persistence.CastMemberRepository;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -116,7 +119,8 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
     final var expectedTotal = 0;
 
     final var aQuery =
-        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort,
+            expectedDirection);
 
     // when
     final var actualOutput = this.castMemberGateway.findAll(aQuery);
@@ -148,7 +152,8 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
     final var expectedDirection = "asc";
 
     final var aQuery =
-        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort,
+            expectedDirection);
 
     // when
     final var actualOutput = this.castMemberGateway.findAll(aQuery);
@@ -183,7 +188,8 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
     final var expectedTerms = "";
 
     final var aQuery =
-        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort,
+            expectedDirection);
 
     // when
     final var actualOutput = this.castMemberGateway.findAll(aQuery);
@@ -218,7 +224,8 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
     final var expectedDirection = "asc";
 
     final var aQuery =
-        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+        new CastMemberSearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort,
+            expectedDirection);
 
     // when
     final var actualOutput = this.castMemberGateway.findAll(aQuery);
@@ -232,6 +239,54 @@ class CastMemberElasticsearchGatewayTest extends AbstractElasticsearchTest {
     if (StringUtils.isNotEmpty(expectedName)) {
       Assertions.assertEquals(expectedName, actualOutput.data().get(0).name());
     }
+  }
+
+  @Test
+  public void givenValidIds_whenCallsFindAllById_shouldReturnElements() {
+    // given
+    final var gabriel = this.castMemberRepository.save(
+        CastMemberDocument.from(Fixture.CastMembers.gabriel()));
+    this.castMemberRepository.save(CastMemberDocument.from(Fixture.CastMembers.wesley()));
+    final var leonan = this.castMemberRepository.save(
+        CastMemberDocument.from(Fixture.CastMembers.leonan()));
+
+    final var expectedSize = 2;
+    final var expectedIds = Set.of(gabriel.id(), leonan.id());
+
+    // when
+    final var actualOutput = this.castMemberGateway.findAllById(expectedIds);
+
+    // then
+    Assertions.assertEquals(expectedSize, actualOutput.size());
+
+    final var actualIds = actualOutput.stream().map(CastMember::id).toList();
+    Assertions.assertTrue(expectedIds.containsAll(actualIds));
+  }
+
+  @Test
+  public void givenNullIds_whenCallsFindAllById_shouldReturnEmpty() {
+    // given
+    final var expectedItems = List.of();
+    final Set<String> expectedIds = null;
+
+    // when
+    final var actualOutput = this.castMemberGateway.findAllById(expectedIds);
+
+    // then
+    Assertions.assertEquals(expectedItems, actualOutput);
+  }
+
+  @Test
+  public void givenEmptyIds_whenCallsFindAllById_shouldReturnEmpty() {
+    // given
+    final var expectedItems = List.of();
+    final Set<String> expectedIds = Set.of();
+
+    // when
+    final var actualOutput = this.castMemberGateway.findAllById(expectedIds);
+
+    // then
+    Assertions.assertEquals(expectedItems, actualOutput);
   }
 
   private void mockCastMembers() {
