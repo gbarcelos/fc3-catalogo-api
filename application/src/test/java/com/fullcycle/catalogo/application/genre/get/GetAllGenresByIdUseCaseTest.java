@@ -17,10 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-class GetAllByIdUseCaseTest extends UseCaseTest {
+class GetAllGenresByIdUseCaseTest extends UseCaseTest {
 
   @InjectMocks
-  private GetAllByIdUseCase useCase;
+  private GetAllGenresByIdUseCase useCase;
 
   @Mock
   private GenreGateway genreGateway;
@@ -34,7 +34,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
     );
 
     final var expectedItems = genres.stream()
-        .map(GetAllByIdUseCase.Output::new)
+        .map(GetAllGenresByIdUseCase.Output::new)
         .toList();
 
     final var expectedIds = genres.stream().map(Genre::id).collect(Collectors.toSet());
@@ -43,7 +43,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
         .thenReturn(genres);
 
     // when
-    final var actualOutput = this.useCase.execute(new GetAllByIdUseCase.Input(expectedIds));
+    final var actualOutput = this.useCase.execute(new GetAllGenresByIdUseCase.Input(expectedIds));
 
     // then
     Assertions.assertTrue(
@@ -60,7 +60,7 @@ class GetAllByIdUseCaseTest extends UseCaseTest {
     final Set<String> expectedIds = null;
 
     // when
-    final var actualOutput = this.useCase.execute(new GetAllByIdUseCase.Input(expectedIds));
+    final var actualOutput = this.useCase.execute(new GetAllGenresByIdUseCase.Input(expectedIds));
 
     // then
     Assertions.assertTrue(actualOutput.isEmpty());
