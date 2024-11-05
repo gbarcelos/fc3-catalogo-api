@@ -10,8 +10,11 @@ import com.fullcycle.catalogo.domain.genre.GenreSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreDocument;
 import com.fullcycle.catalogo.infrastructure.genre.persistence.GenreRepository;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -76,6 +79,16 @@ public class GenreElasticsearchGateway implements GenreGateway {
         .toList();
 
     return new Pagination<>(currentPage, itemsPerPage, total, genres);
+  }
+
+  @Override
+  public List<Genre> findAllById(final Set<String> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return List.of();
+    }
+    return StreamSupport.stream(this.genreRepository.findAllById(ids).spliterator(), false)
+        .map(GenreDocument::toGenre)
+        .toList();
   }
 
   private static Criteria createCriteria(final GenreSearchQuery aQuery) {
