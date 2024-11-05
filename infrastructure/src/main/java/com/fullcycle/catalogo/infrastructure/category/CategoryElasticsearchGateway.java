@@ -6,6 +6,9 @@ import com.fullcycle.catalogo.domain.category.CategorySearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
 import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryDocument;
 import com.fullcycle.catalogo.infrastructure.category.persistence.CategoryRepository;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -52,6 +55,16 @@ public class CategoryElasticsearchGateway implements CategoryGateway {
     public Optional<Category> findById(final String anId) {
         return this.categoryRepository.findById(anId)
                 .map(CategoryDocument::toCategory);
+    }
+
+    @Override
+    public List<Category> findAllById(final Set<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return StreamSupport.stream(this.categoryRepository.findAllById(ids).spliterator(), false)
+            .map(CategoryDocument::toCategory)
+            .toList();
     }
 
     @Override
