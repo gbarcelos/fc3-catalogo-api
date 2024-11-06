@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fullcycle.catalogo.GraphQLControllerTest;
 import com.fullcycle.catalogo.application.castmember.get.GetAllCastMembersByIdUseCase;
@@ -127,10 +128,8 @@ public class VideoGraphQLControllerTest {
         .get();
 
     // then
-    Assertions.assertTrue(
-        actualVideos.size() == expectedVideos.size()
-            && actualVideos.containsAll(expectedVideos)
-    );
+    compareVideoOutput(categories, castMembers, genres, expectedVideos.get(0), actualVideos.get(0));
+    compareVideoOutput(categories, castMembers, genres, expectedVideos.get(1), actualVideos.get(1));
 
     final var capturer = ArgumentCaptor.forClass(ListVideoUseCase.Input.class);
 
@@ -232,6 +231,34 @@ public class VideoGraphQLControllerTest {
     Assertions.assertEquals(expectedGenres, actualQuery.genres());
     Assertions.assertEquals(expectedYearLaunched, actualQuery.launchedAt());
     Assertions.assertEquals(expectedRating, actualQuery.rating());
+  }
+
+  private static void compareVideoOutput(
+      List<GetAllCategoriesByIdUseCase.Output> expectedCategories,
+      List<GetAllCastMembersByIdUseCase.Output> expectedCastMembers,
+      List<GetAllGenresByIdUseCase.Output> expectedGenres,
+      ListVideoUseCase.Output expectedVideo,
+      VideoOutput actualVideo
+  ) {
+    assertThat(actualVideo)
+        .usingRecursiveComparison().ignoringFields("categories", "castMembers", "genres")
+        .isEqualTo(expectedVideo);
+
+
+    Assertions.assertTrue(
+        actualVideo.castMembers().size() == expectedCastMembers.size()
+            && actualVideo.castMembers().containsAll(expectedCastMembers)
+    );
+
+    Assertions.assertTrue(
+        actualVideo.categories().size() == expectedCategories.size()
+            && actualVideo.categories().containsAll(expectedCategories)
+    );
+
+    Assertions.assertTrue(
+        actualVideo.genres().size() == expectedGenres.size()
+            && actualVideo.genres().containsAll(expectedGenres)
+    );
   }
 
   public record VideoOutput(
