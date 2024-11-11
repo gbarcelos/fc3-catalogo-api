@@ -2,8 +2,9 @@ package com.fullcycle.catalogo.infrastructure.graphql;
 
 import com.fullcycle.catalogo.application.genre.list.ListGenreUseCase;
 import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
-import com.fullcycle.catalogo.infrastructure.genre.models.GenreDTO;
-import com.fullcycle.catalogo.infrastructure.genre.models.GenreInput;
+import com.fullcycle.catalogo.infrastructure.genre.GqlGenrePresenter;
+import com.fullcycle.catalogo.infrastructure.genre.models.GqlGenreInput;
+import com.fullcycle.catalogo.infrastructure.genre.models.GqlGenre;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class GenreGraphQLController {
   }
 
   @QueryMapping
-  public List<ListGenreUseCase.Output> genres(
+  public List<GqlGenre> genres(
       @Argument final String search,
       @Argument final int page,
       @Argument final int perPage,
@@ -35,11 +36,13 @@ public class GenreGraphQLController {
   ) {
     final var input = new ListGenreUseCase.Input(page, perPage, search, sort, direction,
         categories);
-    return this.listGenreUseCase.execute(input).data();
+    return this.listGenreUseCase.execute(input)
+        .map(GqlGenrePresenter::present)
+        .data();
   }
 
   @MutationMapping
-  public SaveGenreUseCase.Output saveGenre(@Argument(name = "input") final GenreInput arg) {
+  public SaveGenreUseCase.Output saveGenre(@Argument(name = "input") final GqlGenreInput arg) {
     final var input =
         new SaveGenreUseCase.Input(arg.id(),
             arg.name(),
