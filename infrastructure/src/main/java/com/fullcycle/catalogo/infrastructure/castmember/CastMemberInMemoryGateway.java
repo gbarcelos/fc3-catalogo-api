@@ -1,10 +1,9 @@
-package com.fullcycle.catalogo.infrastructure.genre;
+package com.fullcycle.catalogo.infrastructure.castmember;
 
-import com.fullcycle.catalogo.domain.genre.Genre;
-import com.fullcycle.catalogo.domain.genre.GenreGateway;
-import com.fullcycle.catalogo.domain.genre.GenreSearchQuery;
+import com.fullcycle.catalogo.domain.castmember.CastMember;
+import com.fullcycle.catalogo.domain.castmember.CastMemberGateway;
+import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
 import com.fullcycle.catalogo.domain.pagination.Pagination;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,18 +14,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("development")
-public class GenreInMemoryGateway implements GenreGateway {
+public class CastMemberInMemoryGateway implements CastMemberGateway {
 
-  private final Map<String, Genre> db;
+  private final Map<String, CastMember> db;
 
-  public GenreInMemoryGateway() {
+  public CastMemberInMemoryGateway() {
     this.db = new ConcurrentHashMap<>();
   }
 
   @Override
-  public Genre save(final Genre aGenre) {
-    this.db.put(aGenre.id(), aGenre);
-    return aGenre;
+  public CastMember save(final CastMember aCastMember) {
+    this.db.put(aCastMember.id(), aCastMember);
+    return aCastMember;
   }
 
   @Override
@@ -35,12 +34,12 @@ public class GenreInMemoryGateway implements GenreGateway {
   }
 
   @Override
-  public Optional<Genre> findById(String genreId) {
+  public Optional<CastMember> findById(String genreId) {
     return Optional.ofNullable(this.db.get(genreId));
   }
 
   @Override
-  public List<Genre> findAllById(Set<String> genreId) {
+  public List<CastMember> findAllById(Set<String> genreId) {
     if (genreId == null || genreId.isEmpty()) {
       return List.of();
     }
@@ -50,7 +49,7 @@ public class GenreInMemoryGateway implements GenreGateway {
   }
 
   @Override
-  public Pagination<Genre> findAll(GenreSearchQuery aQuery) {
+  public Pagination<CastMember> findAll(CastMemberSearchQuery aQuery) {
     return new Pagination<>(
         aQuery.page(),
         aQuery.perPage(),
