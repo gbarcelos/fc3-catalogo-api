@@ -385,8 +385,8 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @CsvSource({
       "go,0,10,1,1,Golang 1.22",
       "jav,0,10,1,1,Java 21",
-      "design,0,10,1,1,System Design no Mercado Livre na prática",
-      "assistido,0,10,1,1,System Design no Mercado Livre na prática",
+      "design,0,10,1,1,System Design no Mercado Livre na pratica",
+      "assistido,0,10,1,1,System Design no Mercado Livre na pratica",
       "FTW,0,10,1,1,Java 21",
       "linguagem,0,10,1,1,Golang 1.22",
   })
@@ -429,7 +429,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @ParameterizedTest
   @CsvSource({
       "meeting,0,10,1,1,Golang 1.22",
-      "aulas,0,10,1,1,System Design no Mercado Livre na prática",
+      "aulas,0,10,1,1,System Design no Mercado Livre na pratica",
       "lives,0,10,1,1,Java 21",
       ",0,10,3,3,Golang 1.22",
   })
@@ -474,7 +474,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @CsvSource({
       "gabriel,0,10,1,1,Java 21",
       "wesley,0,10,1,1,Golang 1.22",
-      "luiz,0,10,1,1,System Design no Mercado Livre na prática",
+      "luiz,0,10,1,1,System Design no Mercado Livre na pratica",
       ",0,10,3,3,Golang 1.22",
   })
   public void givenValidCastMember_whenCallsFindAll_shouldReturnElementsFiltered(
@@ -518,7 +518,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @CsvSource({
       "java,0,10,1,1,Java 21",
       "golang,0,10,1,1,Golang 1.22",
-      "systemdesign,0,10,1,1,System Design no Mercado Livre na prática",
+      "systemdesign,0,10,1,1,System Design no Mercado Livre na pratica",
       ",0,10,3,3,Golang 1.22",
   })
   public void givenValidGenre_whenCallsFindAll_shouldReturnElementsFiltered(
@@ -561,8 +561,8 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @ParameterizedTest
   @CsvSource({
       "title,asc,0,10,3,3,Golang 1.22",
-      "title,desc,0,10,3,3,System Design no Mercado Livre na prática",
-      "created_at,asc,0,10,3,3,System Design no Mercado Livre na prática",
+      "title,desc,0,10,3,3,System Design no Mercado Livre na pratica",
+      "created_at,asc,0,10,3,3,System Design no Mercado Livre na pratica",
       "created_at,desc,0,10,3,3,Java 21",
   })
   public void givenValidSortAndDirection_whenCallsFindAll_shouldReturnElementsSorted(
@@ -605,7 +605,7 @@ class VideoElasticsearchGatewayTest extends AbstractElasticsearchTest {
   @CsvSource({
       "0,1,1,3,Golang 1.22",
       "1,1,1,3,Java 21",
-      "2,1,1,3,System Design no Mercado Livre na prática",
+      "2,1,1,3,System Design no Mercado Livre na pratica",
       "3,1,0,3,",
   })
   public void givenValidPage_whenCallsFindAll_shouldReturnElementsPaged(

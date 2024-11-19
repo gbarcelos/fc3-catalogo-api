@@ -36,18 +36,16 @@ public final class Fixture {
   }
 
   public static String title() {
-    return FAKER
-        .options()
-        .option(
-            "System Design no Mercado Livre na prática",
-            "Não cometa esses erros ao trabalhar com Microsserviços",
-            "Testes de Mutação. Você não testa seu software corretamente");
+    return FAKER.options().option(
+        "System Design no Mercado Livre na pratica",
+        "Não cometa esses erros ao trabalhar com Microsserviços",
+        "Testes de Mutação. Você não testa seu software corretamente"
+    );
   }
 
   public static String checksum() {
     return "03fe62de";
   }
-
 
   public static final class Categories {
 
@@ -101,8 +99,7 @@ public final class Fixture {
 
     public static CastMember gabriel() {
       return CastMember.with(UUID.randomUUID().toString(), "Gabriel FullCycle",
-          CastMemberType.ACTOR,
-          now(), now());
+          CastMemberType.ACTOR, now(), now());
     }
 
     public static CastMember leonan() {
@@ -136,13 +133,13 @@ public final class Fixture {
     public static Video systemDesign() {
       return Video.with(
           IdUtils.uniqueId(),
-          "System Design no Mercado Livre na prática",
+          "System Design no Mercado Livre na pratica",
           "O vídeo mais assistido",
-          Fixture.year(),
+          2022,
           Fixture.duration(),
-          rating().getName(),
-          Fixture.bool(),
-          Fixture.bool(),
+          Rating.AGE_16.getName(),
+          true,
+          true,
           InstantUtils.now().toString(),
           InstantUtils.now().toString(),
           "http://video",
@@ -150,9 +147,9 @@ public final class Fixture {
           "http://banner",
           "http://thumb",
           "http://thumbhalf",
-          Set.of(IdUtils.uniqueId()),
-          Set.of(IdUtils.uniqueId()),
-          Set.of(IdUtils.uniqueId())
+          Set.of("aulas"),
+          Set.of("luiz"),
+          Set.of("systemdesign")
       );
     }
 
@@ -160,12 +157,12 @@ public final class Fixture {
       return Video.with(
           IdUtils.uniqueId(),
           "Java 21",
-          "O vídeo mais assistido",
-          Fixture.year(),
+          "Java FTW",
+          2023,
           Fixture.duration(),
-          rating().getName(),
-          Fixture.bool(),
-          Fixture.bool(),
+          Rating.AGE_10.getName(),
+          true,
+          true,
           InstantUtils.now().toString(),
           InstantUtils.now().toString(),
           "http://video",
@@ -173,9 +170,9 @@ public final class Fixture {
           "http://banner",
           "http://thumb",
           "http://thumbhalf",
-          Set.of(IdUtils.uniqueId()),
-          Set.of(IdUtils.uniqueId()),
-          Set.of(IdUtils.uniqueId())
+          Set.of("lives"),
+          Set.of("gabriel"),
+          Set.of("java")
       );
     }
 
