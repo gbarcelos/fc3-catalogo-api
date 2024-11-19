@@ -178,5 +178,28 @@ public final class Fixture {
           Set.of(IdUtils.uniqueId())
       );
     }
+
+    public static Video golang() {
+      return Video.with(
+          IdUtils.uniqueId(),
+          "Golang 1.22",
+          "Um vídeo da linguagem go",
+          2024,
+          Fixture.duration(),
+          Rating.L.getName(),
+          true,
+          true,
+          InstantUtils.now().toString(),
+          InstantUtils.now().toString(),
+          "http://video",
+          "http://trailer",
+          "http://banner",
+          "http://thumb",
+          "http://thumbhalf",
+          Set.of("meeting"),
+          Set.of("wesley"),
+          Set.of("golang")
+      );
+    }
   }
 }
