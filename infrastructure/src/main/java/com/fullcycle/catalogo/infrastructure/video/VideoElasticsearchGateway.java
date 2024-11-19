@@ -33,6 +33,10 @@ public class VideoElasticsearchGateway implements VideoGateway {
 
   @Override
   public void deleteById(final String videoId) {
+    if (videoId == null || videoId.isBlank()) {
+      return;
+    }
+    this.videoRepository.deleteById(videoId);
   }
 
   @Override
