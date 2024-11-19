@@ -7,9 +7,11 @@ import com.fullcycle.catalogo.domain.video.VideoSearchQuery;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("development")
 public class VideoInMemoryGateway implements VideoGateway {
 
   private final Map<String, Video> db;
