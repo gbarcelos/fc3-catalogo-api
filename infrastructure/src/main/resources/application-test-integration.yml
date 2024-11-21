@@ -18,6 +18,8 @@ rest-client:
     read-timeout: 1000
   genres:
     read-timeout: 1000
+  videos:
+    read-timeout: 1000
   keycloak:
     read-timeout: 1000
 

@@ -18,14 +18,14 @@ import org.springframework.web.client.RestClient;
 
 @Component
 @CacheConfig(cacheNames = "admin-categories")
-public class CategoryRestGateway implements CategoryGateway, HttpClient {
+public class CategoryRestClient implements CategoryClient, HttpClient {
 
   public static final String NAMESPACE = "categories";
 
   private final RestClient restClient;
   private final GetClientCredentials getClientCredentials;
 
-  public CategoryRestGateway(@Categories final RestClient categoryHttpClient,
+  public CategoryRestClient(@Categories final RestClient categoryHttpClient,
       final GetClientCredentials getClientCredentials) {
     this.restClient = Objects.requireNonNull(categoryHttpClient);
     this.getClientCredentials = Objects.requireNonNull(getClientCredentials);

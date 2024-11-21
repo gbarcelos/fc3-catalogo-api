@@ -11,7 +11,7 @@ import com.fullcycle.catalogo.AbstractEmbeddedKafkaTest;
 import com.fullcycle.catalogo.application.category.delete.DeleteCategoryUseCase;
 import com.fullcycle.catalogo.application.category.save.SaveCategoryUseCase;
 import com.fullcycle.catalogo.domain.Fixture;
-import com.fullcycle.catalogo.infrastructure.category.CategoryGateway;
+import com.fullcycle.catalogo.infrastructure.category.CategoryClient;
 import com.fullcycle.catalogo.infrastructure.category.models.CategoryEvent;
 import com.fullcycle.catalogo.infrastructure.configuration.json.Json;
 import com.fullcycle.catalogo.infrastructure.kafka.models.connect.MessageValue;
@@ -41,7 +41,7 @@ public class CategoryListenerTest extends AbstractEmbeddedKafkaTest {
   private SaveCategoryUseCase saveCategoryUseCase;
 
   @MockBean
-  private CategoryGateway categoryGateway;
+  private CategoryClient categoryClient;
 
   @SpyBean
   private CategoryListener categoryListener;
@@ -139,7 +139,7 @@ public class CategoryListenerTest extends AbstractEmbeddedKafkaTest {
       return aulas;
     }).when(saveCategoryUseCase).execute(any());
 
-    doReturn(Optional.of(aulas)).when(categoryGateway).categoryOfId(any());
+    doReturn(Optional.of(aulas)).when(categoryClient).categoryOfId(any());
 
     // when
     producer().send(new ProducerRecord<>(categoryTopic, message)).get(10, TimeUnit.SECONDS);
@@ -147,7 +147,7 @@ public class CategoryListenerTest extends AbstractEmbeddedKafkaTest {
     Assertions.assertTrue(latch.await(1, TimeUnit.MINUTES));
 
     // then
-    verify(categoryGateway, times(1)).categoryOfId(eq(aulas.id()));
+    verify(categoryClient, times(1)).categoryOfId(eq(aulas.id()));
 
     verify(saveCategoryUseCase, times(1)).execute(eq(aulas));
   }
@@ -169,7 +169,7 @@ public class CategoryListenerTest extends AbstractEmbeddedKafkaTest {
       return aulas;
     }).when(saveCategoryUseCase).execute(any());
 
-    doReturn(Optional.of(aulas)).when(categoryGateway).categoryOfId(any());
+    doReturn(Optional.of(aulas)).when(categoryClient).categoryOfId(any());
 
     // when
     producer().send(new ProducerRecord<>(categoryTopic, message)).get(10, TimeUnit.SECONDS);
@@ -177,7 +177,7 @@ public class CategoryListenerTest extends AbstractEmbeddedKafkaTest {
     Assertions.assertTrue(latch.await(1, TimeUnit.MINUTES));
 
     // then
-    verify(categoryGateway, times(1)).categoryOfId(eq(aulas.id()));
+    verify(categoryClient, times(1)).categoryOfId(eq(aulas.id()));
 
     verify(saveCategoryUseCase, times(1)).execute(eq(aulas));
   }

@@ -4,6 +4,6 @@ import com.fullcycle.catalogo.infrastructure.genre.models.GenreDTO;
 
 import java.util.Optional;
 
-public interface GenreGateway {
+public interface GenreClient {
   Optional<GenreDTO> genreOfId(String genreId);
 }
