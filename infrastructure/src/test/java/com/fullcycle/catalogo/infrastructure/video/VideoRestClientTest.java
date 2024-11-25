@@ -12,8 +12,11 @@ import static org.mockito.Mockito.doReturn;
 import com.fullcycle.catalogo.AbstractRestClientTest;
 import com.fullcycle.catalogo.domain.Fixture;
 import com.fullcycle.catalogo.domain.exceptions.InternalErrorException;
+import com.fullcycle.catalogo.domain.utils.IdUtils;
 import com.fullcycle.catalogo.infrastructure.authentication.ClientCredentialsManager;
+import com.fullcycle.catalogo.infrastructure.video.models.ImageResourceDTO;
 import com.fullcycle.catalogo.infrastructure.video.models.VideoDTO;
+import com.fullcycle.catalogo.infrastructure.video.models.VideoResourceDTO;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -48,11 +51,11 @@ class VideoRestClientTest extends AbstractRestClientTest {
         golang.duration(),
         golang.opened(),
         golang.published(),
-        golang.video(),
-        golang.trailer(),
-        golang.banner(),
-        golang.thumbnail(),
-        golang.thumbnailHalf(),
+        videoResourceDTO(golang.video()),
+        videoResourceDTO(golang.trailer()),
+        imageResourceDTO(golang.banner()),
+        imageResourceDTO(golang.thumbnail()),
+        imageResourceDTO(golang.thumbnailHalf()),
         golang.categories(),
         golang.castMembers(),
         golang.genres(),
@@ -90,11 +93,11 @@ class VideoRestClientTest extends AbstractRestClientTest {
     Assertions.assertEquals(golang.categories(), actualVideo.categoriesId());
     Assertions.assertEquals(golang.genres(), actualVideo.genresId());
     Assertions.assertEquals(golang.castMembers(), actualVideo.castMembersId());
-    Assertions.assertEquals(golang.video(), actualVideo.video());
-    Assertions.assertEquals(golang.trailer(), actualVideo.trailer());
-    Assertions.assertEquals(golang.banner(), actualVideo.banner());
-    Assertions.assertEquals(golang.thumbnail(), actualVideo.thumbnail());
-    Assertions.assertEquals(golang.thumbnailHalf(), actualVideo.thumbnailHalf());
+    Assertions.assertEquals(golang.video(), actualVideo.video().encodedLocation());
+    Assertions.assertEquals(golang.trailer(), actualVideo.trailer().encodedLocation());
+    Assertions.assertEquals(golang.banner(), actualVideo.banner().location());
+    Assertions.assertEquals(golang.thumbnail(), actualVideo.thumbnail().location());
+    Assertions.assertEquals(golang.thumbnailHalf(), actualVideo.thumbnailHalf().location());
 
     verify(1, getRequestedFor(urlPathEqualTo("/api/videos/%s".formatted(golang.id()))));
   }
@@ -113,11 +116,11 @@ class VideoRestClientTest extends AbstractRestClientTest {
         golang.duration(),
         golang.opened(),
         golang.published(),
-        golang.video(),
-        golang.trailer(),
-        golang.banner(),
-        golang.thumbnail(),
-        golang.thumbnailHalf(),
+        videoResourceDTO(golang.video()),
+        videoResourceDTO(golang.trailer()),
+        imageResourceDTO(golang.banner()),
+        imageResourceDTO(golang.thumbnail()),
+        imageResourceDTO(golang.thumbnailHalf()),
         golang.categories(),
         golang.castMembers(),
         golang.genres(),
@@ -157,11 +160,11 @@ class VideoRestClientTest extends AbstractRestClientTest {
     Assertions.assertEquals(golang.categories(), actualVideo.categoriesId());
     Assertions.assertEquals(golang.genres(), actualVideo.genresId());
     Assertions.assertEquals(golang.castMembers(), actualVideo.castMembersId());
-    Assertions.assertEquals(golang.video(), actualVideo.video());
-    Assertions.assertEquals(golang.trailer(), actualVideo.trailer());
-    Assertions.assertEquals(golang.banner(), actualVideo.banner());
-    Assertions.assertEquals(golang.thumbnail(), actualVideo.thumbnail());
-    Assertions.assertEquals(golang.thumbnailHalf(), actualVideo.thumbnailHalf());
+    Assertions.assertEquals(golang.video(), actualVideo.video().encodedLocation());
+    Assertions.assertEquals(golang.trailer(), actualVideo.trailer().encodedLocation());
+    Assertions.assertEquals(golang.banner(), actualVideo.banner().location());
+    Assertions.assertEquals(golang.thumbnail(), actualVideo.thumbnail().location());
+    Assertions.assertEquals(golang.thumbnailHalf(), actualVideo.thumbnailHalf().location());
 
     final var actualCachedValue = cache("admin-videos").get(golang.id());
     Assertions.assertEquals(actualVideo, actualCachedValue.get());
@@ -255,11 +258,11 @@ class VideoRestClientTest extends AbstractRestClientTest {
         golang.duration(),
         golang.opened(),
         golang.published(),
-        golang.video(),
-        golang.trailer(),
-        golang.banner(),
-        golang.thumbnail(),
-        golang.thumbnailHalf(),
+        videoResourceDTO(golang.video()),
+        videoResourceDTO(golang.trailer()),
+        imageResourceDTO(golang.banner()),
+        imageResourceDTO(golang.thumbnail()),
+        imageResourceDTO(golang.thumbnailHalf()),
         golang.categories(),
         golang.castMembers(),
         golang.genres(),
@@ -276,7 +279,7 @@ class VideoRestClientTest extends AbstractRestClientTest {
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .withFixedDelay(900)
+                .withFixedDelay(600)
                 .withBody(responseBody)
             )
     );
@@ -361,5 +364,14 @@ class VideoRestClientTest extends AbstractRestClientTest {
     Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
 
     verify(3, getRequestedFor(urlPathEqualTo("/api/videos/%s".formatted(expectedId))));
+  }
+
+  private static VideoResourceDTO videoResourceDTO(final String data) {
+    return new VideoResourceDTO(IdUtils.uniqueId(), IdUtils.uniqueId(), data, data, data,
+        "processed");
+  }
+
+  private static ImageResourceDTO imageResourceDTO(final String data) {
+    return new ImageResourceDTO(IdUtils.uniqueId(), IdUtils.uniqueId(), data, data);
   }
 }
