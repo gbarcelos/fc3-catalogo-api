@@ -25,7 +25,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-class GenreRestGatewayTest extends AbstractRestClientTest {
+class GenreRestClientTest extends AbstractRestClientTest {
 
   @Autowired
   private GenreRestClient target;
