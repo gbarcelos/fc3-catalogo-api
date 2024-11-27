@@ -192,7 +192,8 @@ class GenreRestClientTest extends AbstractRestClientTest {
   public void givenAGenre_whenReceiveTimeout_shouldReturnInternalError() {
     // given
     final var business = Fixture.Genres.business();
-    final var expectedErrorMessage = "Timeout observed from genres [resourceId:%s]".formatted(business.id());
+    final var expectedErrorMessage = "Timeout observed from genres [resourceId:%s]".formatted(
+        business.id());
 
     final var responseBody = writeValueAsString(new GenreDTO(
         business.id(),
@@ -219,7 +220,8 @@ class GenreRestClientTest extends AbstractRestClientTest {
     );
 
     // when
-    final var actualEx = Assertions.assertThrows(InternalErrorException.class, () -> target.genreOfId(business.id()));
+    final var actualEx = Assertions.assertThrows(InternalErrorException.class,
+        () -> target.genreOfId(business.id()));
 
     // then
     Assertions.assertEquals(expectedErrorMessage, actualEx.getMessage());
