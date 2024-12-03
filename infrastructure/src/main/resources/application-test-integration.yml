@@ -15,9 +15,13 @@ keycloak:
 rest-client:
   base-url: "http://localhost:${wiremock.server.port:8001}"
   categories:
-    read-timeout: 1000
+    read-timeout: 500
+  genres:
+    read-timeout: 500
+  videos:
+    read-timeout: 500
   keycloak:
-    read-timeout: 1000
+    read-timeout: 500
 
 resilience4j.bulkhead:
   configs:

@@ -5,7 +5,7 @@ import com.fullcycle.catalogo.application.castmember.list.ListCastMembersOutput;
 import com.fullcycle.catalogo.application.castmember.save.SaveCastMemberUseCase;
 import com.fullcycle.catalogo.domain.castmember.CastMember;
 import com.fullcycle.catalogo.domain.castmember.CastMemberSearchQuery;
-import com.fullcycle.catalogo.infrastructure.castmember.models.CastMemberDTO;
+import com.fullcycle.catalogo.infrastructure.castmember.models.GqlCastMemberInput;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -42,7 +42,7 @@ public class CastMemberGraphQLController {
   }
 
   @MutationMapping
-  public CastMember saveCastMember(@Argument CastMemberDTO input) {
+  public CastMember saveCastMember(@Argument GqlCastMemberInput input) {
     return this.saveCastMemberUseCase.execute(input.toCastMember());
   }
 }
