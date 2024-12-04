@@ -3,6 +3,9 @@ elasticsearch:
   username: ${ELASTICSEARCH_USERNAME}
   password: ${ELASTICSEARCH_PASSWORD}
 
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
 keycloak:
   client-id: ${KEYCLOAK_CLIENT_ID}
   client-secret: ${KEYCLOAK_CLIENT_SECRET}
@@ -10,5 +13,6 @@ keycloak:
   host: ${KEYCLOAK_HOST}
 
 rest-client:
+  base-url: ${BASE_URL}
   keycloak:
     read-timeout: 1_000
