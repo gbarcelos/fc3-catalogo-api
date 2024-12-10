@@ -1,16 +1,21 @@
 package com.fullcycle.catalogo.infrastructure.graphql;
 
+import static com.fullcycle.catalogo.infrastructure.configuration.security.Roles.ROLE_ADMIN;
+import static com.fullcycle.catalogo.infrastructure.configuration.security.Roles.ROLE_GENRES;
+import static com.fullcycle.catalogo.infrastructure.configuration.security.Roles.ROLE_SUBSCRIBER;
+
 import com.fullcycle.catalogo.application.genre.list.ListGenreUseCase;
 import com.fullcycle.catalogo.application.genre.save.SaveGenreUseCase;
 import com.fullcycle.catalogo.infrastructure.genre.GqlGenrePresenter;
-import com.fullcycle.catalogo.infrastructure.genre.models.GqlGenreInput;
 import com.fullcycle.catalogo.infrastructure.genre.models.GqlGenre;
+import com.fullcycle.catalogo.infrastructure.genre.models.GqlGenreInput;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -26,6 +31,7 @@ public class GenreGraphQLController {
   }
 
   @QueryMapping
+  @Secured({ROLE_ADMIN, ROLE_SUBSCRIBER, ROLE_GENRES})
   public List<GqlGenre> genres(
       @Argument final String search,
       @Argument final int page,
@@ -42,6 +48,7 @@ public class GenreGraphQLController {
   }
 
   @MutationMapping
+  @Secured({ROLE_ADMIN, ROLE_SUBSCRIBER, ROLE_GENRES})
   public SaveGenreUseCase.Output saveGenre(@Argument(name = "input") final GqlGenreInput arg) {
     final var input =
         new SaveGenreUseCase.Input(arg.id(),
